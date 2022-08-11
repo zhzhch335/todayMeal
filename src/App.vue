@@ -1,31 +1,68 @@
 <template>
   <div id="app">
     <van-cell-group>
-      <van-field v-model="keywords" label="地点" placeholder="输入地点搜索（最好带城市）" />
+      <van-field
+        v-model="keywords"
+        label="地点"
+        placeholder="输入地点搜索（最好带城市）"
+      />
       <div v-if="posList.length" class="posContainer">
-        <div @click="selectPos(item)" class="posItem" v-for="item in posList" :key="item.id">
-          <div class="posName">{{item.name}}</div>
-          <div class="posAddress">{{`${item.pname}${item.cityname}${item.adname}${item.address}`}}</div>
+        <div
+          @click="selectPos(item)"
+          class="posItem"
+          v-for="item in posList"
+          :key="item.id"
+        >
+          <div class="posName">{{ item.name }}</div>
+          <div class="posAddress">
+            {{ `${item.pname}${item.cityname}${item.adname}${item.address}` }}
+          </div>
         </div>
       </div>
-      <van-field disabled readonly v-model="selectedPost.name" label="已选择地点" placeholder="在上方输入关键词后选择地点" />
-      <van-field v-model="radius" type="digit" label="范围（米）" placeholder="查找的半径" />
+      <van-field
+        disabled
+        readonly
+        v-model="selectedPost.name"
+        label="已选择地点"
+        placeholder="在上方输入关键词后选择地点"
+      />
+      <van-field
+        v-model="radius"
+        type="digit"
+        label="范围（米）"
+        placeholder="查找的半径"
+      />
     </van-cell-group>
-    <van-button @click="searchNear" type="info" block style="margin:20px 0">查找</van-button>
+    <van-button @click="searchNear" type="info" block style="margin: 20px 0"
+      >查找</van-button
+    >
     <div v-if="mealList.length" class="mealContainer">
       <van-checkbox-group v-model="selectMealList">
-        <van-checkbox style="margin: 5px 0" v-for="item in mealList" :key="item.id" :name="item.name">{{item.name}}</van-checkbox>
+        <van-checkbox
+          style="margin: 5px 0"
+          v-for="item in mealList"
+          :key="item.id"
+          :name="item.name"
+          >{{ item.name }}</van-checkbox
+        >
       </van-checkbox-group>
       <div v-if="hasMore" @click="moreMeal">查看更多</div>
     </div>
-    <van-button v-if="selectMealList.length" @click="rollMeal" type="info" block style="margin:20px 0">今天吃啥！</van-button>
+    <van-button
+      v-if="selectMealList.length"
+      @click="rollMeal"
+      type="info"
+      block
+      style="margin: 20px 0"
+      >今天吃啥！</van-button
+    >
     <div v-if="result" class="resultLabel">今天要吃的是：</div>
     <div v-if="result" class="result">
       <div class="name">
-        {{result}}
+        {{ result }}
       </div>
       <div class="address">
-        {{mealList.find(item => item.name == result).address}}
+        {{ mealList.find((item) => item.name == result).address }}
       </div>
     </div>
   </div>
@@ -36,7 +73,7 @@ const AMAP_AK = "ce431934e2a0963df9b1c665eefc8314";
 import { Toast } from "vant";
 import axios from "axios";
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       keywords: "", // 地点搜索关键词
@@ -49,29 +86,35 @@ export default {
       selectMealList: [], // 勾选的餐饮列表
       result: "", // 最终选择的结果
       // result: "纪师傅炒饭·铁锅现炒", // 最终选择的结果
-      
+
       debounceTime: null, //输入框防抖
-      page:1, //结果查找页面
-      hasMore: true
-    }
+      page: 1, //结果查找页面
+      hasMore: true,
+    };
   },
-watch: {
-  keywords: {
-    handler(val) {
-      clearTimeout(this.debounceTime)
-      setTimeout(() => {
-        if (val) {
-          axios.get(`https://restapi.amap.com/v3/place/text?key=${AMAP_AK}&keywords=${val}`).then(response => {
-            this.posList = response.data.pois;
-          })
-        }
-        else {
-          this.posList = [];
-        }
-      },800)
-    }
-  }
-},
+  watch: {
+    keywords: {
+      handler(val) {
+        clearTimeout(this.debounceTime);
+        setTimeout(() => {
+          if (val) {
+            axios
+              .get(
+                `https://restapi.amap.com/v3/place/text?key=${AMAP_AK}&keywords=${val}`
+              )
+              .then((response) => {
+                this.posList = response.data.pois;
+              });
+          } else {
+            this.posList = [];
+          }
+        }, 800);
+      },
+    },
+  },
+  mounted() {
+    document.title = "今天吃什么"
+  },
   methods: {
     selectPos(pos) {
       this.selectedPost = pos;
@@ -82,30 +125,49 @@ watch: {
     },
     searchNear() {
       if (!this.selectedPost.name) {
-        Toast("请选择地点后进行搜索")
+        Toast("请选择地点后进行搜索");
         return;
       }
-      axios.get(`https://restapi.amap.com/v3/place/around?key=${AMAP_AK}&location=${this.selectedPost.location}&types=050100|050200|050300&radius=${this.radius || 2000}&offset=25&page=1`).then(response => {
-        this.mealList = response.data.pois;
-        this.selectMealList = this.mealList.map(item => item.name);//默认全部选中
-      })
+      axios
+        .get(
+          `https://restapi.amap.com/v3/place/around?key=${AMAP_AK}&location=${
+            this.selectedPost.location
+          }&types=050100|050200|050300&radius=${
+            this.radius || 2000
+          }&offset=25&page=1`
+        )
+        .then((response) => {
+          this.mealList = response.data.pois;
+          this.selectMealList = this.mealList.map((item) => item.name); //默认全部选中
+        });
     },
     moreMeal() {
-      this.page++
-      axios.get(`https://restapi.amap.com/v3/place/around?key=${AMAP_AK}&location=${this.selectedPost.location}&types=050100|050200|050300&radius=${this.radius || 2000}&offset=25&page=${this.page}`).then(response => {
-        let data = response.data.pois;
-        if (!data.length) {
-          this.hasMore = false;
-        }
-        this.mealList.push(...data);
-        this.selectMealList.push(...data.map(item => item.name))
-      })
+      this.page++;
+      axios
+        .get(
+          `https://restapi.amap.com/v3/place/around?key=${AMAP_AK}&location=${
+            this.selectedPost.location
+          }&types=050100|050200|050300&radius=${
+            this.radius || 2000
+          }&offset=25&page=${this.page}`
+        )
+        .then((response) => {
+          let data = response.data.pois;
+          if (!data.length) {
+            this.hasMore = false;
+          }
+          this.mealList.push(...data);
+          this.selectMealList.push(...data.map((item) => item.name));
+        });
     },
     rollMeal() {
-      this.result = this.selectMealList[Math.floor(Math.random() * this.selectMealList.length)]
-    }
-  }
-}
+      this.result =
+        this.selectMealList[
+          Math.floor(Math.random() * this.selectMealList.length)
+        ];
+    },
+  },
+};
 </script>
 
 <style lang="less">
@@ -159,27 +221,23 @@ watch: {
 
 /*定义滚动条高宽及背景
  高宽分别对应横竖滚动条的尺寸*/
-::-webkit-scrollbar
-{
-    width:8px;
-    height:8px;
-    background-color:#F5F5F5;
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #f5f5f5;
 }
 /*定义滚动条轨道
  内阴影+圆角*/
-::-webkit-scrollbar-track
-{
-    -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.1);
-    border-radius:10px;
-    background-color:#F5F5F5;
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #f5f5f5;
 }
 /*定义滑块
  内阴影+圆角*/
-::-webkit-scrollbar-thumb
-{
-    border-radius:10px;
-    -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.1);
-    background-color:#667572;
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #667572;
 }
-
 </style>
