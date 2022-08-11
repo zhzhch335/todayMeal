@@ -1,2 +1,24 @@
-# todayMeal
-今天吃什么，通过地图获得附近恰饭处来随机roll今天吃的东西
+# today-meal
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
