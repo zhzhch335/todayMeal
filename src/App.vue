@@ -178,9 +178,10 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-  width: 500px;
-  background: #f7f8fa;
+  width: 80vw;
+  max-width: 500px;
   margin: auto;
+  background: #f7f8fa;
   padding: 40px;
 }
 .posContainer {
