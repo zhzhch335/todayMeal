@@ -96,7 +96,7 @@ export default {
     keywords: {
       handler(val) {
         clearTimeout(this.debounceTime);
-        setTimeout(() => {
+        this.debounceTime = setTimeout(() => {
           if (val) {
             axios
               .get(
@@ -170,7 +170,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
